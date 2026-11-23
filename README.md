@@ -23,5 +23,5 @@ A very very smol(not) `turtle` port built on ti_graphics and ti_system for all T
 
 # Demo
 it counts, right?
-- [`media/star.mp4`](https://github.com/user-attachments/assets/c459653f-2076-45e4-8d28-2a64b507d0c1): oh, look it is drawing stars
-- [`media/random.mp4`](https://github.com/user-attachments/assets/9a02c0e8-cd09-4c83-8e88-2715d97fe97e): random doodles
+- [`media/star.mp4`](https://github.com/user-attachments/assets/9a02c0e8-cd09-4c83-8e88-2715d97fe97e): oh, look it is drawing stars
+- [`media/random.mp4`](https://github.com/user-attachments/assets/c459653f-2076-45e4-8d28-2a64b507d0c1): random doodles
