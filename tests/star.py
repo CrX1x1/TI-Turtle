@@ -4,6 +4,7 @@ except ImportError:
     from turtle import Turtle
 
 t = Turtle()
+t.speed(10)
 legs = int(input("How many sides? "))
 t.begin_fill()
 for i in range(legs):
