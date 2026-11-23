@@ -102,13 +102,18 @@ class Turtle: #porting turtle to calculator, no more game BS from before.
         c = math.cos(self._heading)
         s = math.sin(self._heading)
 
+        state_before = (
+            self.x, self.y, self._heading,
+            self._drawing, self._filling, self._pencolor, self._fillcolor, self._pensize
+        )
+
         tx, ty = self._ltov(self.x, self.y)
         lx, ly = self._ltov(self.x + (-12 * c - 6 * s), self.y + (-12 * s + 6 * c))
         rx, ry = self._ltov(self.x + (-12 * c + 6 * s), self.y + (-12 * s - 6 * c))
 
         ti_graphics.setColor(self._pencolor)
         ti_graphics.drawPolyLine([(tx, ty), (lx, ly), (rx, ry), (tx, ty)])
-        self._record(('stamp', (tx, ty, lx, ly, rx, ry), self._pencolor))
+        self._record(('stamp', state_before, (tx, ty, lx, ly, rx, ry), self._pencolor))
     def left(self, angle):
         self._heading -= angle / self._degree_per_au
         self.draw_turtle()
@@ -207,6 +212,13 @@ class Turtle: #porting turtle to calculator, no more game BS from before.
         self._filling = False
         ti_graphics.cls()
         self.draw_turtle()
+    def clearstamps(self):
+        #get rid of stamps in histor and then redraw
+        old = self._history
+        self._history = [action for action in self._history if action[0] != 'stamp']
+        if len(old) != len(self._history):
+            ti_graphics.cls()
+        self.redraw()
     def circle(self, radius, extent=None, segments=None):
         radius = -radius #make circle draw in right place
         if extent is None:
@@ -299,9 +311,7 @@ class Turtle: #porting turtle to calculator, no more game BS from before.
         ti_graphics.setColor(self._pencolor)
         ti_graphics.drawString(str(text), int(x), int(y))
         if move:
-            if align == "right":
-                self.x -= text_width
-            elif align == "center":
+            if align == "center":
                 self.x += text_width // 2
             elif align == "left":
                 self.x += text_width
@@ -328,6 +338,22 @@ class Turtle: #porting turtle to calculator, no more game BS from before.
                 x, y, size, color = dot_params
                 ti_graphics.setColor(color)
                 ti_graphics.fillCircle(int(x), int(y), int(size))
+            elif action_type == 'stamp':
+                _, _, stamp_coords, stamp_color = action
+                tx, ty, lx, ly, rx, ry = stamp_coords
+                ti_graphics.setColor(stamp_color)
+                ti_graphics.drawPolyLine([(tx, ty), (lx, ly), (rx, ry), (tx, ty)])
+            elif action_type == 'write':
+                _, state_before, write_params, _ = action
+                x, y, text, font, align = write_params
+                ti_graphics.setFont(font)
+                ti_graphics.setColor(state_before[5])
+                ti_graphics.drawString(str(text), int(x), int(y))
+            elif action_type == 'fill':
+                _, state_before, view_path, fill_color = action
+                if len(view_path) >= 3:
+                    ti_graphics.setColor(fill_color)
+                    ti_graphics.fillPolygon(view_path)
     def redraw(self):
         self._redraw_recent(len(self._history))
     
@@ -392,14 +418,14 @@ class Turtle: #porting turtle to calculator, no more game BS from before.
                 x, y, text, font, align = write_params
                 ti_graphics.setFont(font)
                 ti_graphics.setColor(prev_pencolor)
-                ti_graphics.drawString(int(x), int(y), str(text), align)
+                ti_graphics.drawString(str(text), int(x), int(y))
             elif kind == 'fill':
                 _, _, view_path, fill_color = action
                 if len(view_path) >= 3:
                     ti_graphics.setColor(fill_color)
                     ti_graphics.fillPolygon(view_path)
             elif kind == 'stamp':
-                _, stamp_coords, stamp_color = action
+                _, _, stamp_coords, stamp_color = action
                 tx, ty, lx, ly, rx, ry = stamp_coords
                 ti_graphics.setColor(stamp_color)
                 ti_graphics.drawPolyLine([(tx, ty), (lx, ly), (rx, ry), (tx, ty)])
